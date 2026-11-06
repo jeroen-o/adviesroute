@@ -1,0 +1,15 @@
+{
+  "name": "Adviesroute",
+  "short_name": "Adviesroute",
+  "description": "Adviesroutes met de auto naar je vakantiebestemming in Europa",
+  "lang": "nl",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f2f4f6",
+  "theme_color": "#232b33",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "/assets/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
