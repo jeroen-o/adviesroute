@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Adviesroutes Duitsland & Oostenrijk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -130,6 +135,8 @@ th { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-
 footer { color: var(--muted); font-size: 13px; padding-block: 0 32px; }
 @media (prefers-reduced-motion: no-preference) { .detail { animation: rise .25s ease-out; } @keyframes rise { from { transform: translateY(4px); } to { transform: none; } } }
 </style>
+</head>
+<body>
 
 <header class="road">
   <div class="wrap">
@@ -412,3 +419,5 @@ function fromHash() { const h = location.hash.slice(1); renderDetail(D.some(d =>
 window.addEventListener("hashchange", fromHash);
 fromHash();
 </script>
+</body>
+</html>
