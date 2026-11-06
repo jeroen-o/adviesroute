@@ -2,6 +2,19 @@
 
 > Adviesroute (adviesroute.nl) geeft adviesroutes met de auto vanuit Nederland naar 39 vakantieregio's en 355 plaatsen in Duitsland, Oostenrijk, Zwitserland, Frankrijk, Italië en Spanje. Per route: de wegen in volgorde, afstand en rijtijd vanaf Utrecht, tol en vignet, een alternatief bij file, laadstops voor elektrische auto's en de plaatsen in de regio. Afstanden en rijtijden zijn indicatief. Laatst bijgewerkt: 2026-11-06.
 
+## Verplicht in de auto
+- Rijbewijs, kentekenbewijs en verzekeringsbewijs: Nederland verplicht, België verplicht, Luxemburg verplicht, Duitsland verplicht, Oostenrijk verplicht, Zwitserland verplicht, Frankrijk verplicht, Italië verplicht, Spanje verplicht.
+- Veiligheidshesje: Nederland aanbevolen, België verplicht, Luxemburg verplicht, Duitsland verplicht, Oostenrijk verplicht, Zwitserland aanbevolen, Frankrijk verplicht, Italië verplicht, Spanje verplicht.
+- Gevarendriehoek: Nederland aanbevolen, België verplicht, Luxemburg verplicht, Duitsland verplicht, Oostenrijk verplicht, Zwitserland verplicht, Frankrijk verplicht, Italië verplicht, Spanje aanbevolen.
+- Verbanddoos: Nederland aanbevolen, België aanbevolen, Luxemburg aanbevolen, Duitsland verplicht, Oostenrijk verplicht, Zwitserland aanbevolen, Frankrijk aanbevolen, Italië aanbevolen, Spanje aanbevolen.
+- Alcoholtest: Nederland niet verplicht, België niet verplicht, Luxemburg niet verplicht, Duitsland niet verplicht, Oostenrijk niet verplicht, Zwitserland niet verplicht, Frankrijk aanbevolen, Italië niet verplicht, Spanje niet verplicht.
+- Brandblusser: Nederland niet verplicht, België aanbevolen, Luxemburg niet verplicht, Duitsland niet verplicht, Oostenrijk niet verplicht, Zwitserland niet verplicht, Frankrijk niet verplicht, Italië niet verplicht, Spanje niet verplicht.
+- Winterbanden: Nederland niet verplicht, België niet verplicht, Luxemburg onder voorwaarden, Duitsland onder voorwaarden, Oostenrijk onder voorwaarden, Zwitserland aanbevolen, Frankrijk onder voorwaarden, Italië onder voorwaarden, Spanje niet verplicht.
+- Sneeuwkettingen: Nederland niet verplicht, België niet verplicht, Luxemburg niet verplicht, Duitsland onder voorwaarden, Oostenrijk onder voorwaarden, Zwitserland onder voorwaarden, Frankrijk onder voorwaarden, Italië onder voorwaarden, Spanje onder voorwaarden.
+- Milieusticker of -registratie: Nederland onder voorwaarden, België onder voorwaarden, Luxemburg niet verplicht, Duitsland onder voorwaarden, Oostenrijk niet verplicht, Zwitserland niet verplicht, Frankrijk onder voorwaarden, Italië onder voorwaarden, Spanje onder voorwaarden.
+- Vignet: Nederland niet verplicht, België niet verplicht, Luxemburg niet verplicht, Duitsland niet verplicht, Oostenrijk verplicht, Zwitserland verplicht, Frankrijk niet verplicht, Italië niet verplicht, Spanje niet verplicht.
+- Waarschuwingsbord fietsendrager: Nederland niet verplicht, België niet verplicht, Luxemburg niet verplicht, Duitsland niet verplicht, Oostenrijk niet verplicht, Zwitserland niet verplicht, Frankrijk niet verplicht, Italië onder voorwaarden, Spanje onder voorwaarden.
+
 ## Algemeen
 - [Startpagina met live verkeer, laden, tol en regels per land](https://adviesroute.nl/)
 - Duitsland: geen tol voor personenauto's. Oostenrijk: vignet verplicht, extra tol voor Brenner (A13), Tauern- en Katschbergtunnel (A10) en Arlbergtunnel. Zwitserland: vignet CHF 40 per jaar. Frankrijk en Italië: tol per traject. Spanje: AP-7 grotendeels tolvrij.

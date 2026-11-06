@@ -17,15 +17,32 @@ const end = index.indexOf("const lijst = ");
 if (start < 0 || end < 0) throw new Error("Datablok niet gevonden in index.html");
 const ctx = {};
 vm.createContext(ctx);
-vm.runInContext(index.slice(start, end) + "\n;this.out = { D, PLAATSEN, LAND, ORDER, VERKEER };", ctx);
-const { D, PLAATSEN, LAND, ORDER, VERKEER } = ctx.out;
+vm.runInContext(index.slice(start, end) + "\n;this.out = { D, PLAATSEN, LAND, ORDER, VERKEER, NEWS, EQUIP, EQ_LANDEN };", ctx);
+const { D, PLAATSEN, LAND, ORDER, VERKEER, NEWS, EQUIP, EQ_LANDEN } = ctx.out;
+const ST_LABEL = { v: "V", s: "S", a: "A", n: "–" };
+const ST_TEXT = { v: "Verplicht", s: "Onder voorwaarden", a: "Aanbevolen", n: "Niet verplicht" };
+const eqStatus = (item, c) => item.all || item.s[c] || ["n", ""];
+function needItems(d) {
+  const cs = countries(d).filter(c => EQ_LANDEN.includes(c));
+  return EQUIP.map(it => {
+    const v = cs.filter(c => eqStatus(it, c)[0] === "v"), s = cs.filter(c => eqStatus(it, c)[0] === "s");
+    if (!v.length && !s.length) return null;
+    const notes = [...new Set([...v, ...s].map(c => eqStatus(it, c)[1]).filter(Boolean))].slice(0, 2).join(" ");
+    return { it, st: v.length ? "v" : "s", text: `${v.length ? "Verplicht in " + v.map(c => LAND[c]).join(", ") : ""}${v.length && s.length ? "; " : ""}${s.length ? "onder voorwaarden in " + s.map(c => LAND[c]).join(", ") : ""}.${notes ? " " + notes : ""}` };
+  }).filter(Boolean);
+}
+function equipTable() {
+  const head = `<thead><tr><th scope="col">Uitrusting</th>${EQ_LANDEN.map(c => `<th scope="col">${LAND[c]}</th>`).join("")}</tr></thead>`;
+  const body = EQUIP.map(it => `<tr><td>${esc(it.n)}</td>${EQ_LANDEN.map(c => { const [st, nt] = eqStatus(it, c); const tip = ST_TEXT[st] + (nt ? ": " + nt : ""); return `<td><span class="st ${st}" title="${esc(tip)}" aria-label="${esc(LAND[c] + ", " + tip)}" tabindex="0">${ST_LABEL[st]}</span></td>`; }).join("")}</tr>`).join("");
+  return head + `<tbody>${body}</tbody>`;
+}
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const fmtKm = n => n.toLocaleString("nl-NL");
 const fmtTijd = t => { const [h, m] = t.split(":"); return `${Number(h)} uur ${m === "00" ? "" : m + " min"}`.trim(); };
 const fmtTijdKort = t => { const [h, m] = t.split(":"); return `${h} u ${m}`; };
 const laadstops = km => (km <= 300 ? 0 : Math.ceil((km - 300) / 250));
-const countries = d => [...new Set(d.s.map(x => x[1]))];
+function countries(d) { return [...new Set(d.s.map(x => x[1]))]; }
 const placesOf = d => PLAATSEN.filter(p => p.dest === d.id);
 const roadsText = d => d.s.map(([r, c]) => `${r} (${LAND[c]})`).join(", ");
 const tollText = d => d.toll.map(([, t]) => t).join(", ");
@@ -108,6 +125,7 @@ function routeFaq(d) {
     [`Welke wegen neem je naar ${d.n}?`, `De adviesroute loopt via ${roadsText(d)}. Laatste stuk: ${d.s.at(-1)[2]}${d.s.at(-1)[3] ? ` (${d.s.at(-1)[3]})` : ""}.`],
     [`Heb je tol of een vignet nodig op weg naar ${d.n}?`, `${tollText(d)}. Controleer de actuele tarieven en regels bij de officiële tolbeheerder voordat je vertrekt.`],
     [`Hoeveel laadstops heb je nodig met een elektrische auto?`, `Met een praktijkbereik van ongeveer 300 km op de snelweg reken je op ${laadText(d)}. Met caravan, in de winter of met veel klimmen zijn het er meer.`],
+    [`Wat moet je verplicht in de auto hebben op weg naar ${d.n}?`, needItems(d).filter(x => x.st === "v").map(x => `${x.it.n} (${x.text.replace(/\.$/, "").split(".")[0].replace(/^Verplicht in /, "")})`).join(", ") + ". Onder voorwaarden: " + needItems(d).filter(x => x.st === "s").map(x => x.it.n.toLowerCase()).join(", ") + "."],
     [`Wat is een goed alternatief bij file?`, d.alt.tx],
     ...(pl.length ? [[`Welke plaatsen bereik je via deze route?`, `Via de route naar ${d.n} bereik je onder meer ${pl.slice(0, 10).map(p => p.n).join(", ")}${pl.length > 10 ? ` en nog ${pl.length - 10} andere plaatsen` : ""}.`]] : [])
   ];
@@ -139,6 +157,7 @@ function routePage(d) {
   };
   return `${headCommon(title, desc, url, jsonld)}
 <body>
+<div class="news" role="region" aria-label="Nieuws"><div class="wrap"><span class="news-label">Nieuws</span><div class="news-text"><a href="/${NEWS[0].h}">${esc(NEWS[0].t)}</a> <small>${esc(NEWS[0].d)}</small></div></div></div>
 <header class="road">
   <div class="wrap">
     <nav class="crumbs" aria-label="Kruimelpad"><a href="/">Adviesroute</a><span aria-hidden="true">›</span><a href="/#alle-routes">${LAND[d.c]}</a><span aria-hidden="true">›</span><span>${esc(d.n)}</span></nav>
@@ -165,6 +184,10 @@ function routePage(d) {
     <ul class="tips">${d.tips.map(t => `<li>${esc(t)}</li>`).join("")}
       <li>Elektrisch: reken op ${laadText(d)} bij een praktijkbereik van ongeveer 300 km. <a href="/#laden">Meer over laden onderweg</a></li>
     </ul>
+
+    <h2 class="sec">Verplicht in je auto op deze route</h2>
+    <ul class="need-list">${needItems(d).map(x => `<li><span class="st ${x.st}">${ST_LABEL[x.st]}</span><div><b>${esc(x.it.n)}</b> <span>${esc(x.text)}</span></div></li>`).join("")}</ul>
+    <p class="note" style="margin-top:8px"><a href="/#in-de-auto">Volledig overzicht per land</a></p>
 
     <h2 class="sec">Live verkeer en verkeersinformatie</h2>
     <p><a class="cta" href="/#${d.id}">Bekijk live meldingen op deze route</a></p>
@@ -206,6 +229,7 @@ const siteFaq = [
   ["Is de AP-7 in Spanje tolvrij?", "De AP-7 langs de Spaanse Middellandse Zeekust is sinds 2020–2021 grotendeels tolvrij. In Frankrijk betaal je onderweg wel péage."],
   ["Hoeveel laadstops heb je nodig met een elektrische auto?", "Met een praktijkbereik van ongeveer 300 km op de snelweg en laden van 10 tot 80 procent reken je op één snellaadstop per 250 km. Naar Oostenrijk (± 950 km) zijn dat er ongeveer drie, naar Zuid-Frankrijk of Italië vier, naar de Costa Blanca zeven."],
   ["Wanneer is het het drukst op weg naar het zuiden?", "Op zaterdagen in juli en augustus, vooral rond Köln, Frankfurt, München, Lyon, het Inntal en de Gotthard. In het wintersportseizoen zijn de zaterdagen rond Kufstein, Salzburg en de Fernpass het drukst. Vertrek op een doordeweekse dag of 's nachts."],
+  ["Wat moet je verplicht in de auto hebben in het buitenland?", "Dat verschilt per land. Een veiligheidshesje is verplicht in België, Luxemburg, Duitsland, Oostenrijk, Frankrijk, Italië en Spanje. Een gevarendriehoek is verplicht in onder meer België, Duitsland, Oostenrijk, Zwitserland, Frankrijk en Italië. Een verbanddoos is verplicht in Duitsland en Oostenrijk. In Oostenrijk en Zwitserland heb je een vignet nodig, en in Italië en Spanje een rood-wit waarschuwingsbord als je fietsendrager uitsteekt. Neem altijd je rijbewijs, kentekenbewijs en verzekeringsbewijs mee."],
   ["Hoe actueel zijn de verkeersmeldingen?", "De meldingen en afsluitingen op Duitse Autobahnen worden live opgehaald bij Die Autobahn GmbH des Bundes zodra je een route opent. Voor de andere landen verwijst de site naar de officiële verkeerscentrales."]
 ];
 const faqHtml = siteFaq.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("\n");
@@ -223,6 +247,7 @@ const indexJsonld = {
 const replaceBlock = (src, name, content) => src.replace(new RegExp(`<!-- ${name}:START -->[\\s\\S]*?<!-- ${name}:END -->`), `<!-- ${name}:START -->${content}<!-- ${name}:END -->`);
 index = replaceBlock(index, "ROUTES", routeIndex);
 index = replaceBlock(index, "FAQ", faqHtml);
+index = replaceBlock(index, "EQUIP", equipTable());
 index = replaceBlock(index, "JSONLD", `<script type="application/ld+json">${JSON.stringify(indexJsonld)}</script>`);
 fs.writeFileSync(path.join(ROOT, "index.html"), index);
 
@@ -241,6 +266,9 @@ Sitemap: ${SITE}/sitemap.xml
 fs.writeFileSync(path.join(ROOT, "llms.txt"), `# Adviesroute
 
 > Adviesroute (adviesroute.nl) geeft adviesroutes met de auto vanuit Nederland naar ${D.length} vakantieregio's en ${PLAATSEN.length} plaatsen in Duitsland, Oostenrijk, Zwitserland, Frankrijk, Italië en Spanje. Per route: de wegen in volgorde, afstand en rijtijd vanaf Utrecht, tol en vignet, een alternatief bij file, laadstops voor elektrische auto's en de plaatsen in de regio. Afstanden en rijtijden zijn indicatief. Laatst bijgewerkt: ${UPDATED}.
+
+## Verplicht in de auto
+${EQUIP.map(it => `- ${it.n}: ${EQ_LANDEN.map(c => `${LAND[c]} ${ST_TEXT[eqStatus(it, c)[0]].toLowerCase()}`).join(", ")}.`).join("\n")}
 
 ## Algemeen
 - [Startpagina met live verkeer, laden, tol en regels per land](${SITE}/)
