@@ -180,7 +180,7 @@ footer { color: var(--muted); font-size: 13px; padding-block: 0 32px; }
 
 <div class="wrap">
   <div class="controls">
-    <input id="zoek" type="search" placeholder="Zoek op plaats of regio, bijv. Winterberg, Gardameer of Costa Brava" aria-label="Zoek bestemming">
+    <input id="zoek" type="search" placeholder="Zoek op plaats of regio, bijv. Hallstatt, Lloret de Mar of Grindelwald" aria-label="Zoek bestemming">
     <div class="chips" role="group" aria-label="Filter op land" id="chips"></div>
   </div>
 
@@ -513,6 +513,54 @@ const D = [
     tips: ["Dit is een rit van twee dagen; overnacht bijvoorbeeld rond Lyon of Narbonne.","Ook rond Valencia is de snelweg sinds 2020 tolvrij."], toll: T.es }
 ];
 
+// Plaatsen per bestemming: "Naam|laatste stuk vanaf de hoofdroute"
+const PL = {
+  "sauerland": "Winterberg|Eindpunt van de route, via de B480;Willingen|Vanaf Brilon via de B251, ± 20 km;Brilon|Einde A46, dan de B7;Olsberg|Aan de B7, vlak na het einde van de A46;Schmallenberg|Vanaf Winterberg westwaarts, ± 25 km;Medebach|Vanaf Winterberg oostwaarts, ± 15 km;Bad Berleburg|Vanaf Winterberg zuidwaarts, ± 25 km;Sundern (Sorpesee)|A46 afrit Arnsberg, ± 15 km;Meschede (Hennesee)|A46 afrit Meschede",
+  "moezel": "Cochem|Eindpunt van de route, via de B259;Bernkastel-Kues|A48/A1 afrit Wittlich-Mitte, dan de B50;Traben-Trarbach|Vanaf Wittlich via de B50, ± 20 km;Zell (Mosel)|Vanaf Cochem langs de Moezel stroomopwaarts, ± 35 km;Trier|A48, A1 en A602 tot Trier;Daun|A1 afrit Daun;Manderscheid|Vanaf Wittlich of Daun, ± 20 km;Gerolstein|Vanaf Daun, ± 20 km;Nürburgring|A61 afrit Mendig, ± 35 km via Mayen;Bad Neuenahr-Ahrweiler|A61 afrit Bad Neuenahr-Ahrweiler",
+  "harz": "Goslar|Eindpunt van de route, via de B82;Wernigerode|Vanaf Goslar over de B6;Braunlage|Vanaf Bad Harzburg via de B4;Bad Harzburg|Vanaf Goslar over de B6, ± 10 km;Hahnenklee|Vanaf Goslar zuidwaarts, ± 15 km;Clausthal-Zellerfeld|Vanaf Goslar zuidwaarts, ± 20 km;Schierke|Vanaf Wernigerode, ± 15 km;Thale|Vanaf Wernigerode oostwaarts, ± 35 km;Quedlinburg|Vanaf Wernigerode over de B6, ± 30 km;Sankt Andreasberg|Vanaf Braunlage, ± 10 km",
+  "berlijn": "Berlijn|Eindpunt van de route;Potsdam|Direct aan de A10, zuidwestzijde;Spreewald (Lübbenau)|Vanaf de A10 de A13 zuidwaarts, afrit Lübbenau",
+  "oostzee": "Binz|Via Rügenbrücke en Bergen, B96 en L29;Sellin|Vanaf Binz zuidwaarts, ± 10 km;Göhren|Vanaf Sellin, ± 10 km;Sassnitz|Vanaf Bergen noordoostwaarts, ± 20 km;Stralsund|Laatste stad voor de Rügenbrücke;Rostock|A20 afrit Rostock, A19 noordwaarts;Warnemünde|Via Rostock, ± 15 km;Kühlungsborn|A20 afrit Kröpelin, ± 25 km;Zingst|A20 afrit Bad Sülze, via Ribnitz-Damgarten, ± 50 km;Prerow|Via Ribnitz-Damgarten over het Fischland, ± 45 km;Heringsdorf|A20 afrit Gützkow, B111 via Wolgast;Ahlbeck|Naast Heringsdorf op Usedom;Zinnowitz|A20 afrit Gützkow, B111 via Wolgast",
+  "zwarte-woud": "Freiburg|A5 afrit Freiburg;Titisee-Neustadt|Eindpunt van de route, via de B31;Hinterzarten|Aan de B31, vlak voor Titisee;Feldberg|Vanaf Titisee, ± 15 km;Schluchsee|Vanaf Titisee zuidwaarts, ± 15 km;Todtnau|Vanaf Feldberg via de B317;Baden-Baden|A5 afrit Baden-Baden;Triberg|A5 afrit Offenburg, B33, ± 50 km;Europa-Park Rust|A5 afrit Ettenheim/Rust",
+  "bodensee": "Lindau|Eindpunt van de route, einde A96;Wasserburg|Vanaf Lindau westwaarts, ± 8 km;Friedrichshafen|Vanaf Lindau over de B31, ± 25 km;Meersburg|Via Friedrichshafen over de B31, ± 45 km;Überlingen|Over de B31, ± 60 km vanaf Lindau;Konstanz|Zie alternatief: A81 en B33;Insel Mainau|Vlak bij Konstanz",
+  "allgau": "Füssen|Eindpunt van de A7;Schwangau|Vanaf Füssen, ± 5 km;Pfronten|A7 afrit Nesselwang, ± 10 km;Nesselwang|A7 afrit Nesselwang;Kempten|A7 afrit Kempten;Oberstdorf|Dreieck Allgäu, A980 en B19;Sonthofen|Via de B19;Bad Hindelang|Vanaf Sonthofen, ± 8 km;Oberstaufen|Vanaf Immenstadt westwaarts, ± 15 km;Kleinwalsertal (Riezlern)|Alleen via Oberstdorf bereikbaar, ± 10 km;Isny|A96 afrit Leutkirch, ± 15 km",
+  "garmisch": "Garmisch-Partenkirchen|Eindpunt van A95 en B2;Mittenwald|Vanaf Garmisch over de B2, ± 20 km;Grainau (Zugspitze)|Vanaf Garmisch, ± 8 km;Oberammergau|Vanaf de B2 bij Oberau, via Ettal, ± 15 km;Murnau|A95 afrit Murnau/Kochel;Tegernsee|Vanaf de A8 afrit Holzkirchen, ± 30 km;Schliersee|Vanaf de A8 afrit Weyarn, ± 20 km",
+  "berchtesgaden": "Berchtesgaden|Eindpunt van de route, via de B20;Bad Reichenhall|A8 afrit Bad Reichenhall;Schönau am Königssee|Vanaf Berchtesgaden, ± 5 km;Ramsau bei Berchtesgaden|Vanaf Berchtesgaden westwaarts, ± 10 km;Chiemsee (Prien)|A8 afrit Bernau of Rosenheim;Ruhpolding|A8 afrit Traunstein/Siegsdorf, ± 15 km;Inzell|A8 afrit Traunstein/Siegsdorf, ± 15 km;Reit im Winkl|A8 afrit Grabenstätt, ± 25 km",
+  "zillertal": "Mayrhofen|Eindpunt van de B169;Fügen|Eerste grote plaats in het Zillertal;Kaltenbach|Aan de B169;Zell am Ziller|Aan de B169;Hippach|Aan de B169, net voor Mayrhofen;Gerlos|Vanaf Zell am Ziller over de Gerlosstraße;Hintertux|Vanaf Mayrhofen, ± 18 km;Achensee (Pertisau)|A12 afrit Wiesing, B181 noordwaarts;Alpbach|A12 afrit Kramsach, ± 15 km",
+  "innsbruck": "Innsbruck|A12 afrit Innsbruck;Neustift im Stubaital|Eindpunt van de B183;Fulpmes|Aan de B183;Igls|Vanaf Innsbruck zuidwaarts, ± 8 km;Axams (Axamer Lizum)|Vanaf Innsbruck zuidwestwaarts, ± 20 km;Hall in Tirol|A12 afrit Hall;Seefeld|Zie alternatief via Garmisch, of vanaf Zirl de B177;Kühtai|A12 afrit Telfs/Stams, ± 25 km",
+  "otztal": "Sölden|Eindpunt van de B186;Längenfeld|Aan de B186;Oetz|Aan de B186, begin van het Ötztal;Obergurgl|Vanaf Sölden, ± 12 km;Imst|A12 afrit Imst;Pitztal|Vanaf Imst zuidwaarts;Landeck|A12 afrit Landeck;St. Anton am Arlberg|Vanaf Landeck over de S16;Lech|Via St. Anton en Stuben over de Flexenpas;Ischgl|Vanaf Landeck de B188 het Paznauntal in;Serfaus-Fiss-Ladis|Vanaf Landeck de B180, ± 30 km;Nauders|Vanaf Landeck de B180, ± 45 km;Kaunertal|Vanaf Landeck de B180, dan het Kaunertal in",
+  "vorarlberg": "Bregenz|A14 afrit Bregenz;Dornbirn|A14 afrit Dornbirn;Bezau|Vanaf Dornbirn de L200;Mellau|Vanaf Bezau, ± 5 km;Damüls|Vanaf Au in de Bregenzerwald, ± 15 km;Schruns|Eindpunt van de B188;Tschagguns|Naast Schruns;Gaschurn|Vanaf Schruns verder het Montafon in, ± 12 km;Brand (Brandnertal)|A14 afrit Bludenz, ± 12 km",
+  "wilder-kaiser": "Söll|A12 afrit Kufstein-Süd, B178;Scheffau|Aan de B178;Ellmau|Aan de B178;Going|Aan de B178;St. Johann in Tirol|Eindpunt van de B178;Kitzbühel|Vanaf Wörgl de B170;Kirchberg in Tirol|Aan de B170, voor Kitzbühel;Westendorf|Vanaf Wörgl de B170;Hopfgarten|Aan de B170;Brixen im Thale|Aan de B170;Fieberbrunn|Vanaf St. Johann de B164, ± 12 km;Waidring|Vanaf St. Johann de B178 oostwaarts, ± 15 km",
+  "zell-saalbach": "Zell am See|Eindpunt van de route, via de B311;Kaprun|Vanaf Zell am See, ± 8 km;Saalbach|Vanaf Maishofen het Glemmtal in;Hinterglemm|Voorbij Saalbach;Leogang|Vanaf Saalfelden de B164;Saalfelden|Aan de B311;Maria Alm|Vanaf Saalfelden, ± 5 km;Lofer|Aan de B311, net over de grens;Mittersill|Vanaf Zell am See westwaarts, ± 25 km;Krimml|Vanaf Mittersill, ± 30 km",
+  "ski-amade": "Flachau|A10 afrit Flachau;Wagrain|A10 afrit Wagrain;Altenmarkt|A10 afrit Altenmarkt;Zauchensee|Vanaf Altenmarkt, ± 10 km;Radstadt|A10 afrit Radstadt;Filzmoos|Vanaf Radstadt of Eben, ± 15 km;Obertauern|Vanaf Radstadt de B99, ± 20 km;Schladming|A10 afrit Ennstal, B320;Ramsau am Dachstein|Vanaf Schladming, ± 10 km;St. Johann im Pongau|A10 afrit Bischofshofen, B311;Großarl|Vanaf St. Johann im Pongau, ± 20 km;Bad Hofgastein|Via Lend de B167;Bad Gastein|Via Lend de B167, voorbij Bad Hofgastein;Werfen|A10 afrit Werfen",
+  "salzkammergut": "St. Gilgen|Via Fuschl over de B158;Fuschl am See|Aan de B158;St. Wolfgang|Vanaf Strobl langs de oostoever;Strobl|Aan de B158;Bad Ischl|Eindpunt van de B158;Bad Goisern|Vanaf Bad Ischl de B145;Hallstatt|Vanaf Bad Goisern langs de Hallstätter See;Gosau|Vanaf Bad Goisern, ± 15 km;Bad Aussee|Vanaf Bad Goisern over de Pötschenpass;Mondsee|A1 afrit Mondsee;Gmunden|Zie alternatief via Regau, B145",
+  "karinthie": "Velden|A2 afrit Velden;Pörtschach|A2 afrit Pörtschach;Klagenfurt|A2 afrit Klagenfurt;Villach|A10/A2 bij Villach;Faaker See|Vanaf Villach oostwaarts, ± 10 km;Ossiacher See|A10 afrit Villach-Ossiacher See;Millstatt|A10 afrit Seeboden, ± 10 km;Seeboden|A10 afrit Seeboden;Bad Kleinkirchheim|Vanaf Seeboden via Radenthein, ± 30 km;Katschberg|A10 afrit Rennweg/Katschberg;Hermagor (Nassfeld)|Vanaf Villach westwaarts, ± 50 km;Heiligenblut|Via de Großglockner Hochalpenstraße of via Lienz",
+  "wenen": "Wenen|Eindpunt van de A1;Linz|A1 bij Linz;St. Pölten|A1 afrit St. Pölten;Melk|A1 afrit Melk;Spitz|Vanaf Melk langs de Donau, ± 20 km;Dürnstein|Vanaf Melk langs de Donau, ± 35 km;Krems|Via de Wachau of de S33 vanaf St. Pölten",
+  "luzern": "Luzern|A2 afrit Luzern;Weggis|Vanaf Luzern langs het meer, ± 20 km;Vitznau|Voorbij Weggis, ± 5 km;Brunnen|A4 afrit Brunnen;Stans|A2 afrit Stans;Engelberg|A2 afrit Stans-Süd, ± 20 km;Sursee|A2 afrit Sursee",
+  "berner-oberland": "Interlaken|A8 afrit Interlaken;Grindelwald|Vanaf Interlaken, ± 20 km;Lauterbrunnen|Vanaf Interlaken, ± 12 km;Wengen|Autovrij: parkeer in Lauterbrunnen;Mürren|Autovrij: parkeer in Stechelberg;Thun|A6 afrit Thun;Spiez|A6 bij Spiez;Brienz|A8 voorbij Interlaken, ± 15 km;Meiringen|Via Brienz, ± 30 km vanaf Interlaken;Adelboden|Vanaf Spiez via Frutigen, ± 30 km;Kandersteg|Vanaf Spiez via Frutigen, ± 25 km;Gstaad|Vanaf Spiez door het Simmental, ± 50 km",
+  "wallis": "Zermatt|Autovrij: parkeer in Täsch, shuttletrein;Täsch|Vanaf Visp het Mattertal in;Saas-Fee|Vanaf Visp het Saastal in, autovrij dorp;Visp|Na de autotrein via Goppenstein;Brig|Vanaf Visp oostwaarts, ± 10 km;Fiesch (Aletsch)|Vanaf Brig, ± 20 km;Leukerbad|Vanaf Leuk, ± 15 km;Crans-Montana|Vanaf Sierre, ± 15 km;Verbier|Via de A9 tot Martigny, dan Le Châble",
+  "graubunden": "Davos|Eindpunt van de route, via Klosters;Klosters|Aan de A28;Bad Ragaz|A13 afrit Bad Ragaz;Chur|A13 afrit Chur;Lenzerheide|Vanaf Chur zuidwaarts, ± 20 km;Arosa|Vanaf Chur, ± 30 km bergweg;Flims-Laax|Vanaf Chur westwaarts, ± 20 km;St. Moritz|Via Lenzerheide over de Julierpas;Pontresina|Vanaf St. Moritz, ± 7 km;Scuol|Autotrein Vereina vanaf Klosters",
+  "ticino": "Lugano|A2 afrit Lugano;Bellinzona|A2 bij Bellinzona;Locarno|Bij Bellinzona de A13;Ascona|Vanaf Locarno, ± 5 km;Morcote|Vanaf Lugano langs het meer, ± 15 km;Airolo|A2 direct na de Gotthardtunnel",
+  "parijs": "Parijs|Eindpunt van de A1;Disneyland Paris|Francilienne (N104) en A4, Marne-la-Vallée;Versailles|Via de A86 westwaarts;Fontainebleau|Via de A6 zuidwaarts, ± 60 km;Lille|A1 bij Lille (route via Kortrijk)",
+  "dordogne": "Sarlat-la-Canéda|Eindpunt van de route, D703;Souillac|A20 afrit Souillac;Rocamadour|A20 afrit Rocamadour, ± 25 km;Domme|Vanaf Sarlat zuidwaarts, ± 12 km;La Roque-Gageac|Vanaf Sarlat, ± 10 km;Les Eyzies|Vanaf Sarlat westwaarts, ± 20 km;Bergerac|Vanaf Brive de A89 en N21, of via Périgueux;Périgueux|Vanaf Brive de A89 westwaarts;Brive-la-Gaillarde|A20 bij Brive",
+  "ardeche": "Vallon-Pont-d'Arc|Eindpunt van de route, D4;Salavas|Naast Vallon-Pont-d'Arc;Ruoms|A7 afrit Montélimar-Nord, N102;Aubenas|A7 afrit Montélimar-Nord, N102;Les Vans|Vanaf Ruoms zuidwestwaarts, ± 25 km;Bourg-Saint-Andéol|A7 afrit Montélimar-Sud;Saint-Martin-d'Ardèche|A7 afrit Bollène, via Pont-Saint-Esprit",
+  "provence": "Avignon|A7 afrit Avignon-Nord of -Sud;Orange|A7 afrit Orange;Vaison-la-Romaine|Vanaf Orange, ± 30 km;Gordes|A7 afrit Cavaillon, ± 20 km;Roussillon|A7 afrit Cavaillon, ± 25 km;L'Isle-sur-la-Sorgue|A7 afrit Cavaillon of Avignon-Sud;Saint-Rémy-de-Provence|A7 afrit Cavaillon, ± 15 km;Arles|Vanaf Salon de A54;Aix-en-Provence|A7 en A8;Moustiers (Verdon)|Vanaf Aix de A51 tot Manosque, ± 60 km;Saintes-Maries-de-la-Mer|Via Arles de Camargue in",
+  "cote-dazur": "Nice|A8 afrit Nice;Cannes|A8 afrit Cannes;Antibes|A8 afrit Antibes;Fréjus|A8 afrit Fréjus;Saint-Raphaël|A8 afrit Fréjus/Saint-Raphaël;Sainte-Maxime|A8 afrit Le Muy, ± 25 km;Saint-Tropez|A8 afrit Le Muy, ± 35 km;Monaco|A8 voorbij Nice;Menton|A8 voorbij Monaco;Hyères|Vanaf de A8 de A57",
+  "gardameer": "Riva del Garda|Eindpunt van de route, SS240;Torbole|Vlak bij Riva;Arco|Vanaf Riva, ± 6 km;Limone sul Garda|Vanaf Riva langs de westoever, ± 10 km;Malcesine|Vanaf Torbole langs de oostoever, ± 15 km;Garda|A22 afrit Affi;Bardolino|A22 afrit Affi;Lazise|A22 afrit Affi;Peschiera del Garda|A22 en A4, afrit Peschiera;Sirmione|A4 afrit Sirmione",
+  "dolomieten": "Ortisei|A22 afrit Chiusa, SS242;Santa Cristina|Voorbij Ortisei;Selva di Val Gardena|Eindpunt van de SS242;Canazei|A22 afrit Egna-Ora, SS48;Bolzano|A22 afrit Bolzano;Merano|A22 afrit Bolzano-Sud, snelweg MeBo;Corvara (Alta Badia)|A22 afrit Bressanone, via het Pustertal;Brunico (Kronplatz)|A22 afrit Bressanone, Pustertal oostwaarts;Cortina d'Ampezzo|Via het Pustertal en Dobbiaco, SS51;Madonna di Campiglio|A22 afrit San Michele, ± 70 km",
+  "venetie": "Venetië|Piazzale Roma of Tronchetto;Lido di Jesolo|A4 afrit Noventa di Piave;Caorle|A4 afrit Santo Stino;Bibione|A4 afrit Latisana;Lignano Sabbiadoro|A4 afrit Latisana;Verona|A22 bij Verona;Padova|A4 afrit Padova;Chioggia|Vanaf Padova of Mestre zuidwaarts",
+  "toscane": "Florence|A1 afrit Firenze;Siena|Vanaf Florence de Raccordo, ± 70 km;San Gimignano|Vanaf de Raccordo afrit Poggibonsi;Greve in Chianti|Vanaf Florence zuidwaarts, ± 30 km;Pisa|Vanaf Florence de FI-PI-LI of A11;Lucca|Vanaf Florence de A11;Arezzo|A1 afrit Arezzo;Montepulciano|A1 afrit Valdichiana",
+  "comomeer": "Como|A9 afrit Como;Menaggio|Vanaf Lugano via Porlezza, ± 30 km;Bellagio|Vanaf Como langs het meer, ± 30 km;Varenna|Oostoever, via Lecco;Stresa|Bij Bellinzona de A13, via Locarno langs het meer;Milaan|A9 tot Milano",
+  "costa-brava": "Lloret de Mar|Eindpunt van de route, C-63;Tossa de Mar|Vanaf Lloret, ± 12 km;Blanes|AP-7 afrit Blanes/Lloret;Platja d'Aro|AP-7 afrit Girona, ± 40 km;Calella de Palafrugell|AP-7 afrit Girona, ± 45 km;Pals|AP-7 afrit Girona, ± 45 km;L'Estartit|AP-7 afrit Girona, ± 40 km;L'Escala|AP-7 afrit Figueres, ± 25 km;Empuriabrava|AP-7 afrit Figueres, ± 15 km;Roses|AP-7 afrit Figueres, C-260;Cadaqués|Voorbij Roses, ± 15 km bergweg;Figueres|AP-7 afrit Figueres;Girona|AP-7 afrit Girona",
+  "barcelona": "Barcelona|AP-7 en C-33;Sitges|AP-7 om Barcelona, C-32;Calella|AP-7 afrit Maresme, C-32;Malgrat de Mar|AP-7 afrit Maresme, C-32;Montserrat|AP-7 en A-2 westwaarts, ± 60 km",
+  "costa-dorada": "Salou|AP-7 afrit Salou;La Pineda|Naast Salou;Cambrils|AP-7 afrit Cambrils;Tarragona|AP-7 afrit Tarragona;L'Ametlla de Mar|AP-7 afrit L'Ametlla de Mar;Peñíscola|AP-7 zuidwaarts, afrit Peñíscola;Vinaròs|AP-7 afrit Vinaròs",
+  "costa-blanca": "Benidorm|AP-7 afrit Benidorm;Altea|AP-7 afrit Altea;Calpe|AP-7 afrit Calp;Jávea|AP-7 afrit Ondara, ± 20 km;Dénia|AP-7 afrit Ondara;Gandia|AP-7 afrit Gandia;Cullera|AP-7 afrit Cullera;Valencia|A-7 bij Valencia;Alicante|AP-7 zuidwaarts tot Alicante;Torrevieja|Voorbij Alicante, ± 50 km"
+};
+const slug = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const PLAATSEN = Object.entries(PL).flatMap(([dest, str]) => str.split(";").map(x => {
+  const [n, leg] = x.split("|");
+  return { id: "p-" + slug(n), n, leg, dest };
+}));
+
 const LAND = { DE: "Duitsland", AT: "Oostenrijk", CH: "Zwitserland", FR: "Frankrijk", IT: "Italië", ES: "Spanje", NL: "Nederland", BE: "België", LU: "Luxemburg" };
 const ORDER = ["DE", "AT", "CH", "FR", "IT", "ES"];
 const VERKEER = {
@@ -532,6 +580,7 @@ const detail = document.getElementById("detail");
 const zoek = document.getElementById("zoek");
 let filter = "all";
 let current = null;
+let currentPlace = null;
 
 function cls(road, cc) {
   if (road === "Trein") return "r-train";
@@ -571,25 +620,40 @@ function visible() {
     (!q || (d.n + " " + d.p + " " + LAND[d.c]).toLowerCase().includes(q)));
 }
 
+function visiblePlaces() {
+  const q = zoek.value.trim().toLowerCase();
+  if (q.length < 2) return [];
+  return PLAATSEN.filter(p => {
+    const d = D.find(x => x.id === p.dest);
+    return (filter === "all" || d.c === filter) && p.n.toLowerCase().includes(q);
+  });
+}
+
 function renderList() {
   const items = visible();
-  if (!items.length) { lijst.innerHTML = `<p class="empty">Geen bestemming gevonden. Probeer een regio of een andere plaatsnaam.</p>`; return; }
+  const places = visiblePlaces();
+  if (!items.length && !places.length) { lijst.innerHTML = `<p class="empty">Geen bestemming gevonden. Probeer een regio of een andere plaatsnaam.</p>`; return; }
   let html = "";
   ORDER.forEach(c => {
     const g = items.filter(d => d.c === c);
-    if (!g.length) return;
+    const gp = places.filter(p => D.find(x => x.id === p.dest).c === c);
+    if (!g.length && !gp.length) return;
     html += `<div class="group-label">${LAND[c]}</div>`;
-    html += g.map(d => `<button class="dest" id="d-${d.id}" data-id="${d.id}" aria-current="${current === d.id}">
+    html += g.map(d => `<button class="dest" id="d-${d.id}" data-id="${d.id}" aria-current="${current === d.id && !currentPlace}">
       <b>${esc(d.n)}</b><span class="km">${fmtKm(d.km)} km</span><small>${esc(d.p)}</small></button>`).join("");
+    html += gp.map(p => { const d = D.find(x => x.id === p.dest); return `<button class="dest" id="d-${p.id}" data-id="${p.id}" aria-current="${currentPlace === p.id}">
+      <b>${esc(p.n)}</b><span class="km">± ${fmtKm(d.km)} km</span><small>Route ${esc(d.n)}</small></button>`; }).join("");
   });
   lijst.innerHTML = html;
 }
 
 function laadstops(km) { return km <= 300 ? 0 : Math.ceil((km - 300) / 250); }
 
-function renderDetail(id) {
+function renderDetail(id, place) {
   const d = D.find(x => x.id === id) || D[0];
   current = d.id;
+  currentPlace = place ? place.id : null;
+  const regio = PLAATSEN.filter(p => p.dest === d.id);
   const summary = d.s.map(([r, c]) => badge(r, c)).join('<span class="arrow">›</span>');
   const n = laadstops(d.km);
   const links = countries(d).flatMap(c => VERKEER[c] ? VERKEER[c].map(([nm, u]) => `<a href="${u}" target="_blank" rel="noopener">${LAND[c]}: ${nm}</a>`) : []).join("");
@@ -605,13 +669,14 @@ function renderDetail(id) {
         <div class="stat"><span>Rijtijd</span><strong>± ${fmtTijd(d.t)}</strong></div>
       </div>
     </div>
+    ${place ? `<div class="alt" style="margin-top:16px"><p><b>${esc(place.n)}</b>: volg de route naar ${esc(d.n)}. Laatste stuk: ${esc(place.leg)}.</p></div>` : ""}
     <div class="summary" aria-label="Wegen in volgorde">${summary}</div>
     <div class="toll">${d.toll.map(([k, t]) => `<span class="pill ${k}">${esc(t)}</span>`).join("")}</div>
 
     <h3>Hoofdroute vanaf Utrecht</h3>
     <ol class="route">
       ${d.s.map(([r, c, t, nt]) => `<li><div class="sign">${badge(r, c)}</div><div class="txt"><b>${esc(t)}<span class="cc">${c}</span></b>${nt ? `<span>${esc(nt)}</span>` : ""}</div></li>`).join("")}
-      <li><div class="sign"><span class="r r-dest">Doel</span></div><div class="txt"><b>${esc(d.p)}</b></div></li>
+      <li><div class="sign"><span class="r r-dest">Doel</span></div><div class="txt"><b>${esc(place ? place.n : d.p)}</b>${place ? `<span>${esc(place.leg)}</span>` : ""}</div></li>
     </ol>
 
     <h3>Verkeer nu op je route</h3>
@@ -625,12 +690,15 @@ function renderDetail(id) {
       <li>Elektrisch: met een praktijkbereik van ongeveer 300 km op de snelweg reken je op ${n === 0 ? "geen snellaadstop onderweg" : `± ${n} snellaadstop${n > 1 ? "s" : ""} van 20 tot 30 minuten`}. <a href="#laden">Meer over laden</a></li>
     </ul>
 
+    <h3>Plaatsen in deze regio</h3>
+    <div class="links">${regio.map(p => `<a href="#${p.id}"${p.id === currentPlace ? ' aria-current="true" style="font-weight:700"' : ""}>${esc(p.n)}</a>`).join("")}</div>
+
     <h3>Verkeerscentrales langs deze route</h3>
     <div class="links">${links}</div>
 
     <div class="toll"><button class="btn" id="kopieer">Kopieer route als tekst</button><span id="kopieer-status" class="cc" role="status"></span></div>
   `;
-  document.getElementById("kopieer").addEventListener("click", () => copyRoute(d));
+  document.getElementById("kopieer").addEventListener("click", () => copyRoute(d, place));
   renderList();
   loadTraffic(d);
 }
@@ -694,8 +762,8 @@ async function loadTraffic(d) {
   document.getElementById("ververs").addEventListener("click", () => { roads.forEach(r => delete cache[r]); loadTraffic(d); });
 }
 
-function copyRoute(d) {
-  const txt = `Route naar ${d.n} (${d.p}) — ± ${fmtKm(d.km)} km, ± ${fmtTijd(d.t)} vanaf Utrecht\n` +
+function copyRoute(d, place) {
+  const txt = (place ? `${place.n}: volg de route naar ${d.n}. Laatste stuk: ${place.leg}.\n` : "") + `Route naar ${d.n} (${d.p}) — ± ${fmtKm(d.km)} km, ± ${fmtTijd(d.t)} vanaf Utrecht\n` +
     d.s.map(([r, c, t, nt], i) => `${i + 1}. ${r} (${c}) ${t}${nt ? " – " + nt : ""}`).join("\n") +
     `\nAlternatief: ${d.alt.tx}`;
   const st = document.getElementById("kopieer-status");
@@ -727,11 +795,15 @@ document.getElementById("chips").addEventListener("click", e => {
 zoek.addEventListener("input", () => {
   renderList();
   const v = visible();
-  if (v.length === 1 && v[0].id !== current) location.hash = v[0].id;
+  const vp = visiblePlaces();
+  if (vp.length === 1 && vp[0].id !== currentPlace) location.hash = vp[0].id;
+  else if (v.length === 1 && !vp.length && v[0].id !== current) location.hash = v[0].id;
 });
 function fromHash() {
   const h = location.hash.slice(1);
   if (["actueel", "laden", "praktisch"].includes(h)) { if (!current) renderDetail("zillertal"); return; }
+  const pl = PLAATSEN.find(p => p.id === h);
+  if (pl) { renderDetail(pl.dest, pl); return; }
   renderDetail(D.some(d => d.id === h) ? h : "zillertal");
 }
 window.addEventListener("hashchange", fromHash);
