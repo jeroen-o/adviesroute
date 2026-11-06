@@ -1,0 +1,414 @@
+<title>Adviesroutes Duitsland & Oostenrijk</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&family=Overpass+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: asfaltband als kop, links bestemmingslijst, rechts de route als verticale weg met bordjes */
+:root {
+  --bg: #f2f4f6;
+  --surface: #ffffff;
+  --fg: #16212c;
+  --muted: #586572;
+  --line: #d6dce2;
+  --accent: #1d55a0;
+  --accent-soft: #e3ecf8;
+  --asphalt: #232b33;
+  --asphalt-fg: #eef2f5;
+  --lane: #f4c400;
+  --warn-bg: #fff6d6;
+  --warn-fg: #5c4500;
+  --font-display: "Overpass", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Overpass", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Overpass Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1418; --surface: #171f27; --fg: #e5eaef; --muted: #93a0ac; --line: #2a3541;
+    --accent: #79a6e8; --accent-soft: #1b2a3f; --asphalt: #0a0e12; --asphalt-fg: #e5eaef;
+    --warn-bg: #3a3112; --warn-fg: #f1dc94; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1418; --surface: #171f27; --fg: #e5eaef; --muted: #93a0ac; --line: #2a3541;
+  --accent: #79a6e8; --accent-soft: #1b2a3f; --asphalt: #0a0e12; --asphalt-fg: #e5eaef;
+  --warn-bg: #3a3112; --warn-fg: #f1dc94; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Kop */
+header.road { background: var(--asphalt); color: var(--asphalt-fg); position: relative; overflow: hidden; }
+header.road .wrap { padding-block: 36px 44px; display: grid; gap: 10px; }
+header.road::after { content: ""; position: absolute; left: 0; right: 0; bottom: 18px; height: 4px;
+  background: repeating-linear-gradient(90deg, var(--lane) 0 46px, transparent 46px 82px); opacity: .9; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; opacity: .75; }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(30px, 5vw, 50px); line-height: 1.05; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+header p { margin: 0; max-width: 62ch; opacity: .85; }
+
+/* Filters */
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding-block: 20px 8px; }
+.controls input { flex: 1 1 240px; min-width: 0; font: inherit; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { font: inherit; font-weight: 600; font-size: 14px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+:focus-visible { outline: 3px solid var(--lane); outline-offset: 2px; }
+
+/* Hoofdindeling */
+main.layout { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 24px; padding-block: 12px 40px; align-items: start; }
+@media (max-width: 820px) { main.layout { grid-template-columns: minmax(0, 1fr); } }
+.list { display: grid; gap: 4px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); max-height: calc(100vh - 24px); overflow-y: auto; padding-right: 4px; }
+@media (max-width: 820px) { .list { position: static; max-height: 300px; border: 1px solid var(--line); border-radius: 10px; padding: 6px; background: var(--surface); } }
+.group-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: 12px 10px 4px; }
+.dest { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 10px 12px; border-radius: 8px; cursor: pointer; }
+.dest:hover { background: var(--accent-soft); }
+.dest[aria-current="true"] { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+.dest:focus-visible { outline: 3px solid var(--lane); }
+.dest b { font-weight: 600; }
+.dest small { grid-column: 1; color: var(--muted); font-size: 13px; }
+.dest .km { grid-row: 1 / span 2; grid-column: 2; align-self: center; font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+.empty { color: var(--muted); padding: 12px; }
+
+/* Detail */
+.detail { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px clamp(16px, 3vw, 32px) 28px; min-width: 0; }
+.detail-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; align-items: flex-start; }
+.detail h2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(24px, 3.4vw, 34px); line-height: 1.1; margin: 4px 0 6px; text-wrap: balance; }
+.detail .places { color: var(--muted); margin: 0; }
+.flag { font-family: var(--font-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.stats { display: flex; gap: 22px; flex-wrap: wrap; }
+.stat { display: grid; }
+.stat span { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.stat strong { font-family: var(--font-mono); font-size: 22px; font-variant-numeric: tabular-nums; }
+.summary { margin: 18px 0 4px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.summary .arrow { color: var(--muted); font-size: 13px; }
+.btn { font: inherit; font-size: 14px; font-weight: 600; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+
+h3 { font-family: var(--font-display); font-size: 18px; margin: 26px 0 10px; }
+ol.route { list-style: none; margin: 0; padding: 0; position: relative; }
+ol.route::before { content: ""; position: absolute; left: 31px; top: 8px; bottom: 8px; width: 6px; border-radius: 3px; background: var(--asphalt); }
+ol.route li { position: relative; display: grid; grid-template-columns: 68px minmax(0, 1fr); gap: 14px; padding: 8px 0; align-items: start; }
+ol.route li .sign { display: flex; justify-content: center; position: relative; z-index: 1; padding-top: 1px; }
+ol.route li .txt { min-width: 0; padding-top: 2px; }
+ol.route li .txt b { display: block; }
+ol.route li .txt span { color: var(--muted); font-size: 14px; }
+ol.route li.end .sign::after { content: ""; }
+.cc { font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: .08em; margin-left: 6px; }
+
+/* Wegnummerbordjes */
+.r { display: inline-block; font-family: var(--font-mono); font-weight: 700; font-size: 13px; line-height: 1; padding: 6px 8px 5px; border-radius: 5px; min-width: 44px; text-align: center; border: 2px solid; white-space: nowrap; }
+.r-nlA { background: #c8102e; color: #fff; border-color: #fff; box-shadow: 0 0 0 1px #c8102e; }
+.r-nlN { background: #f6c500; color: #111; border-color: #111; }
+.r-deA { background: #1f4fa0; color: #fff; border-color: #fff; box-shadow: 0 0 0 1px #1f4fa0; border-radius: 8px; }
+.r-deB { background: #f6c500; color: #111; border-color: #111; }
+.r-atA { background: #1f4fa0; color: #fff; border-color: #fff; box-shadow: 0 0 0 1px #1f4fa0; }
+.r-atB { background: #fff; color: #1f4fa0; border-color: #1f4fa0; }
+.r-dest { background: var(--fg); color: var(--surface); border-color: var(--fg); }
+
+.alt { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; display: grid; gap: 8px; }
+.alt p { margin: 0; }
+.alt .roads { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+ul.tips { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.toll { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); }
+.pill.need { background: var(--warn-bg); color: var(--warn-fg); border-color: transparent; }
+.pill.free { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+
+/* Praktische info */
+section.info { padding-block: 8px 48px; }
+section.info h2 { font-family: var(--font-display); font-weight: 800; font-size: 26px; margin: 0 0 14px; }
+.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; }
+.info-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; min-width: 0; }
+.info-card h3 { margin: 0 0 8px; }
+.info-card ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.disclaimer { background: var(--warn-bg); color: var(--warn-fg); border-radius: 10px; padding: 12px 16px; margin-top: 20px; font-size: 14px; }
+footer { color: var(--muted); font-size: 13px; padding-block: 0 32px; }
+@media (prefers-reduced-motion: no-preference) { .detail { animation: rise .25s ease-out; } @keyframes rise { from { transform: translateY(4px); } to { transform: none; } } }
+</style>
+
+<header class="road">
+  <div class="wrap">
+    <div class="eyebrow">Adviesroutes · vertrek vanuit Nederland</div>
+    <h1>Op vakantie naar Duitsland en Oostenrijk</h1>
+    <p>Per bestemming de hoofdroute weg voor weg, een alternatief bij file, en wat je onderweg moet weten over vignet, tol en rijverboden.</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="controls">
+    <input id="zoek" type="search" placeholder="Zoek op plaats of regio, bijv. Winterberg of Zillertal" aria-label="Zoek bestemming">
+    <div class="chips" role="group" aria-label="Filter op land">
+      <button class="chip" id="f-all" data-f="all" aria-pressed="true">Alle</button>
+      <button class="chip" id="f-de" data-f="DE" aria-pressed="false">Duitsland</button>
+      <button class="chip" id="f-at" data-f="AT" aria-pressed="false">Oostenrijk</button>
+    </div>
+  </div>
+
+  <main class="layout">
+    <nav class="list" id="lijst" aria-label="Bestemmingen"></nav>
+    <article class="detail" id="detail" aria-live="polite"></article>
+  </main>
+
+  <section class="info" id="praktisch">
+    <h2>Praktisch onderweg</h2>
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>Duitsland</h3>
+        <ul>
+          <li>Geen tol of vignet voor personenauto's op de Autobahn.</li>
+          <li>Geen algemene snelheidslimiet op veel trajecten; adviessnelheid 130 km/u. Let op borden met 120/100.</li>
+          <li>Milieuzones (Umweltzone) in veel steden: groene Umweltplakette nodig om de binnenstad in te rijden.</li>
+          <li>Winterbanden verplicht bij winterse omstandigheden (situatief), ongeacht de datum.</li>
+          <li>Bij file direct een vrije strook (Rettungsgasse) maken: links tussen linker- en middelste rijstrook.</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <h3>Oostenrijk</h3>
+        <ul>
+          <li>Vignet verplicht op Autobahn en Schnellstraße. Een online gekocht digitaal vignet is voor consumenten pas na 18 dagen geldig; koop op tijd of bij een verkooppunt aan de grens.</li>
+          <li>Extra tol (Sondermaut) bovenop het vignet: Tauern- en Katschbergtunnel (A10), Brennerautobahn (A13), Arlbergtunnel (S16), Karawankentunnel (A11), Bosruck- en Gleinalmtunnel (A9).</li>
+          <li>Winterbanden verplicht van 1 november tot 15 april bij winterse omstandigheden. Sneeuwkettingen meenemen bij bordje.</li>
+          <li>Tirol en Salzburgerland: op drukke weekenden afritverboden voor doorgaand verkeer om files te ontwijken. Bestemmingsverkeer mag er wel af; houd je boekingsbevestiging bij de hand.</li>
+          <li>Rettungsgasse ook hier verplicht.</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <h3>Grensovergangen per vertrekregio</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Vertrek</th><th>Richting zuid</th><th>Richting oost/noord</th></tr></thead>
+            <tbody>
+              <tr><td>Noord (Groningen, Friesland)</td><td><span class="r r-nlA">A7</span> Bunde → <span class="r r-deA">A31</span> naar Ruhrgebied</td><td><span class="r r-nlA">A7</span> → <span class="r r-deA">A28</span> Bremen → <span class="r r-deA">A1</span></td></tr>
+              <tr><td>Oost (Twente, Achterhoek)</td><td><span class="r r-nlA">A12</span> Elten → <span class="r r-deA">A3</span></td><td><span class="r r-nlA">A1</span> De Lutte → <span class="r r-deA">A30</span></td></tr>
+              <tr><td>Midden en West</td><td><span class="r r-nlA">A12</span> Elten → <span class="r r-deA">A3</span></td><td><span class="r r-nlA">A1</span> De Lutte → <span class="r r-deA">A30</span></td></tr>
+              <tr><td>Zuid (Brabant, Limburg)</td><td><span class="r r-nlA">A67</span> Venlo → <span class="r r-deA">A61</span>, of <span class="r r-nlA">A76</span> Heerlen → <span class="r r-deA">A4</span></td><td><span class="r r-nlA">A67</span> Venlo → <span class="r r-deA">A40</span> → <span class="r r-deA">A2</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="info-card">
+        <h3>Wanneer vertrekken</h3>
+        <ul>
+          <li>Zomer: zaterdagen in juli en augustus zijn de drukste dagen, vooral rond Köln, Frankfurt, München en het Inntal.</li>
+          <li>Vertrek op een doordeweekse dag, of 's nachts zodat je de Duitse ochtendspits rond de grote knooppunten voor bent.</li>
+          <li>Wintersport: wisseldagen zijn meestal zaterdag. Rond Kufstein, Salzburg en de Fernpass staan dan lange files.</li>
+          <li>Plan elke 2 uur een pauze. Duitse Raststätten zijn duurder dan Autohöfe net naast de snelweg.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="disclaimer"><strong>Indicatief.</strong> Afstanden en reistijden zijn berekend vanaf Utrecht, zonder pauzes en file. Wegwerkzaamheden, omleidingen en tol- of vignetregels veranderen per seizoen. Controleer vóór vertrek de actuele situatie in je navigatie of bij de ANWB, en de vignetregels op asfinag.at.</div>
+  </section>
+  <footer>Wegnummers volgen de bewegwijzering ter plaatse. Rood = Nederlandse snelweg, blauw = Autobahn, geel = Duitse Bundesstraße, wit-blauw = Oostenrijkse Bundesstraße.</footer>
+</div>
+
+<script>
+// s: [weg, land, titel, toelichting]
+const D = [
+  { id: "sauerland", c: "DE", n: "Sauerland", p: "Winterberg, Willingen, Schmallenberg", km: 300, t: "3:15",
+    s: [["A12","NL","Utrecht → Arnhem → grens Elten",""],["A3","DE","Richting Oberhausen","Tot Kreuz Oberhausen"],["A2","DE","Richting Hannover","Tot Kamener Kreuz"],["A1","DE","Richting Köln","Kort stuk tot Kreuz Dortmund/Unna"],["A44","DE","Richting Kassel","Tot Kreuz Werl"],["A445","DE","Richting Arnsberg",""],["A46","DE","Richting Meschede","Snelweg eindigt bij Bestwig"],["B7","DE","Richting Brilon / Olsberg","Voor Willingen: in Brilon de B251"],["B480","DE","Naar Winterberg","Bergweg, in de winter sneeuwkettingen meenemen"]],
+    alt: { tx: "Vanuit Zuid-Nederland via Venlo en het Ruhrgebied. Korter, maar de A40 staat in de spits vaak vast.", r: [["A67","NL"],["A40","DE"],["A1","DE"],["A44","DE"],["A46","DE"]] },
+    tips: ["Bij file op de A2 rond Oberhausen–Bottrop is de route via de A42 een bekende uitwijk.","In het skiseizoen staat de B480 bij Winterberg op zaterdagochtend vol; vroeg aankomen scheelt."], vig: false },
+  { id: "moezel", c: "DE", n: "Moezel en Eifel", p: "Cochem, Bernkastel-Kues, Daun", km: 370, t: "4:00",
+    s: [["A2","NL","Utrecht → 's-Hertogenbosch → Eindhoven",""],["A67","NL","Richting Venlo","Grens bij Venlo/Kaldenkirchen"],["A61","DE","Richting Koblenz","Langs Mönchengladbach en Kreuz Meckenheim, tot Kreuz Koblenz"],["A48","DE","Richting Trier","Afrit Kaisersesch"],["B259","DE","Naar Cochem","Daalt af naar het Moezeldal"]],
+    alt: { tx: "Naar Bernkastel-Kues: blijf op de A48/A1 tot afrit Wittlich-Mitte en neem de B50 over de Hochmoselbrücke.", r: [["A61","DE"],["A48","DE"],["A1","DE"],["B50","DE"]] },
+    tips: ["Vanuit Oost-Nederland is A12 → A3 → Köln → A61 vaak even snel.","De A1 door de Eifel is bij Blankenheim onderbroken; navigatie stuurt je over de B51/B258."], vig: false },
+  { id: "harz", c: "DE", n: "Harz", p: "Goslar, Wernigerode, Braunlage", km: 450, t: "4:45",
+    s: [["A1","NL","Utrecht → Amersfoort → Deventer → grens De Lutte",""],["A30","DE","Richting Osnabrück","Tot Bad Oeynhausen"],["A2","DE","Richting Hannover","Tot Kreuz Hannover-Ost"],["A7","DE","Richting Kassel","Langs Hildesheim, afrit Rhüden"],["B82","DE","Naar Goslar",""],["B6","DE","Naar Wernigerode","Vierbaans, sluit aan op het oosten van de Harz"]],
+    alt: { tx: "Naar Braunlage: vanaf Goslar richting Bad Harzburg en dan de B4 de bergen in.", r: [["B6","DE"],["B4","DE"]] },
+    tips: ["De A2 rond Hannover is de drukste vrachtroute van Duitsland; vermijd vrijdagmiddag.","Op de Brocken kun je niet met de auto: parkeer in Schierke of neem de Brockenbahn."], vig: false },
+  { id: "berlijn", c: "DE", n: "Berlijn", p: "Berlijn, Potsdam", km: 650, t: "6:30",
+    s: [["A1","NL","Utrecht → Deventer → grens De Lutte",""],["A30","DE","Richting Osnabrück","Tot Bad Oeynhausen"],["A2","DE","Richting Hannover / Berlin","Langs Hannover en Magdeburg tot Dreieck Werder"],["A10","DE","Berliner Ring","Noord of zuid om de stad, afhankelijk van je adres"],["A100","DE","Stadsring Berlijn","Of A115 via Avus naar het westen van de stad"]],
+    alt: { tx: "Vanuit Noord-Nederland via Bremen en Hannover, of over Hamburg en de A24.", r: [["A7","NL"],["A28","DE"],["A1","DE"],["A7","DE"],["A2","DE"]] },
+    tips: ["Berlijn binnen de S-Bahn-ring is milieuzone: groene Umweltplakette verplicht.","Potsdam ligt direct aan de A10; ideaal als tussenstop of uitvalsbasis."], vig: false },
+  { id: "oostzee", c: "DE", n: "Oostzeekust", p: "Rügen, Usedom, Rostock", km: 800, t: "8:15",
+    s: [["A1","NL","Utrecht → grens De Lutte",""],["A30","DE","Richting Osnabrück","Tot Lotter Kreuz"],["A1","DE","Richting Bremen / Hamburg","Door Hamburg over de Norderelbbrücke, verder naar Lübeck"],["A20","DE","Ostseeautobahn","Langs Wismar en Rostock"],["B96","DE","Naar Stralsund en Rügen","Over de Rügenbrücke naar Bergen en Binz"]],
+    alt: { tx: "Naar Usedom: blijf op de A20 tot afrit Gützkow en neem de B111 via Wolgast naar het eiland.", r: [["A20","DE"],["B111","DE"]] },
+    tips: ["Vanuit Groningen: A7 → A28 → A1 Bremen is korter dan via De Lutte.","In de zomer staan de bruggen naar Rügen en Usedom op zaterdag vol; kom vroeg of laat aan."], vig: false },
+  { id: "zwarte-woud", c: "DE", n: "Zwarte Woud", p: "Freiburg, Titisee, Schwarzwaldhochstraße", km: 650, t: "6:30",
+    s: [["A2","NL","Utrecht → Eindhoven",""],["A67","NL","Richting Venlo",""],["A61","DE","Richting Koblenz / Ludwigshafen","Langs Koblenz, Bingen en Worms tot Dreieck Hockenheim"],["A6","DE","Richting Heilbronn","Kort stuk tot Kreuz Walldorf"],["A5","DE","Richting Karlsruhe / Basel","Langs Karlsruhe en Offenburg tot Freiburg"],["B31","DE","Door het Höllental naar Titisee",""]],
+    alt: { tx: "Vanuit Midden- en Oost-Nederland via Arnhem, Köln en Frankfurt naar de A5.", r: [["A12","NL"],["A3","DE"],["A5","DE"]] },
+    tips: ["Op de A5 tussen Karlsruhe en Basel wordt veel gewerkt; check vooraf de werkzaamheden.","De Schwarzwaldhochstraße (B500) vanaf Baden-Baden is een mooie toeristische route naar het noordelijke deel."], vig: false },
+  { id: "bodensee", c: "DE", n: "Bodensee", p: "Lindau, Friedrichshafen, Konstanz", km: 830, t: "8:15",
+    s: [["A12","NL","Utrecht → Arnhem → grens Elten",""],["A3","DE","Richting Köln / Frankfurt","Tot Kreuz Biebelried bij Würzburg"],["A7","DE","Richting Ulm / Kempten","Tot Kreuz Memmingen"],["A96","DE","Richting Lindau","Eindigt bij Lindau aan de Oostenrijkse grens"]],
+    alt: { tx: "Naar Konstanz: via Venlo de A61, dan A6 tot Kreuz Weinsberg en de A81 naar Singen. Laatste stuk over de B33.", r: [["A61","DE"],["A6","DE"],["A81","DE"],["B33","DE"]] },
+    tips: ["Rond Stuttgart en op de A81 staat in de spits vaak file.","Lindau ligt tegen Oostenrijk: rijd je door naar Bregenz, dan heb je vanaf de grens een vignet nodig."], vig: false },
+  { id: "allgau", c: "DE", n: "Allgäu", p: "Füssen, Oberstdorf, Kempten", km: 830, t: "8:30",
+    s: [["A12","NL","Utrecht → Arnhem → grens Elten",""],["A3","DE","Richting Köln / Frankfurt / Würzburg","Tot Kreuz Biebelried"],["A7","DE","Richting Ulm / Füssen","Langs Ulm, Memmingen en Kempten. Eindigt bij Füssen"]],
+    alt: { tx: "Naar Oberstdorf: op de A7 bij Dreieck Allgäu de A980, daarna de B19.", r: [["A7","DE"],["A980","DE"],["B19","DE"]] },
+    tips: ["De A7 is de kortste noord-zuidroute, maar rond Würzburg en Ulm vaak druk.","Bij Füssen ligt Schloss Neuschwanstein: online tickets reserveren."], vig: false },
+  { id: "garmisch", c: "DE", n: "Beierse Alpen", p: "Garmisch-Partenkirchen, Mittenwald", km: 900, t: "9:00",
+    s: [["A12","NL","Utrecht → Arnhem → grens Elten",""],["A3","DE","Richting Frankfurt / Nürnberg","Tot Kreuz Nürnberg"],["A9","DE","Richting München","Tot Kreuz München-Nord"],["A99","DE","Ring om München, westzijde","Tot Kreuz München-Süd-West"],["A96","DE","Richting centrum München","Naar de Mittlerer Ring"],["A95","DE","Richting Garmisch-Partenkirchen","Gaat over in de B2"],["B2","DE","Naar Garmisch en Mittenwald",""]],
+    alt: { tx: "Via Ulm en de A7 tot Füssen, dan binnendoor over de B17 en B23 langs Oberammergau. Rustiger en mooier.", r: [["A7","DE"],["B17","DE"],["B23","DE"]] },
+    tips: ["Op zaterdag is de A95 in het skiseizoen druk; vertrek voor 8 uur uit München.","Mittenwald ligt vlak bij de grens: rijd je door naar Seefeld, dan heb je op de B177 geen vignet nodig."], vig: false },
+  { id: "berchtesgaden", c: "DE", n: "Berchtesgadener Land", p: "Berchtesgaden, Bad Reichenhall, Königssee", km: 950, t: "9:15",
+    s: [["A12","NL","Utrecht → Arnhem → grens Elten",""],["A3","DE","Richting Frankfurt / Nürnberg","Tot Kreuz Nürnberg"],["A9","DE","Richting München","Tot Kreuz München-Nord"],["A99","DE","Ring om München, oostzijde","Richting Salzburg"],["A8","DE","Richting Salzburg","Langs de Chiemsee, afrit Bad Reichenhall"],["B20","DE","Naar Berchtesgaden",""]],
+    alt: { tx: "Via Regensburg en de A92/A94 kun je München helemaal mijden. Langer, maar soms sneller bij file.", r: [["A3","DE"],["A92","DE"],["A94","DE"],["A8","DE"]] },
+    tips: ["De A8 tussen München en Salzburg is in het zomerweekend een van de drukste stukken van Duitsland.","Afrit Bad Reichenhall ligt vóór de grens; je hebt geen Oostenrijks vignet nodig."], vig: false },
+
+  { id: "zillertal", c: "AT", n: "Zillertal", p: "Mayrhofen, Fügen, Zell am Ziller", km: 950, t: "9:30",
+    s: [["A12","NL","Utrecht → Arnhem → grens Elten",""],["A3","DE","Richting Frankfurt / Nürnberg","Tot Kreuz Nürnberg"],["A9","DE","Richting München","Tot Kreuz München-Nord"],["A99","DE","Ring om München, oostzijde","Richting Salzburg"],["A8","DE","Richting Salzburg","Tot Inntaldreieck"],["A93","DE","Richting Kufstein / Innsbruck","Grens Kiefersfelden"],["A12","AT","Inntalautobahn","Afrit Zillertal (Wiesing)"],["B169","AT","Zillertalstraße","Naar Fügen, Zell am Ziller en Mayrhofen"]],
+    alt: { tx: "Vanuit Zuid-Nederland via Venlo, de A61 en Stuttgart, dan A8 tot München. Ongeveer even lang.", r: [["A61","DE"],["A6","DE"],["A8","DE"]] },
+    tips: ["Op zaterdag staat de Inntalautobahn rond Kufstein vaak uren vast. Vertrek 's nachts.","Het grensstuk tot Kufstein-Süd is vignetvrij; daarna is een vignet verplicht."], vig: true },
+  { id: "innsbruck", c: "AT", n: "Innsbruck en Stubaital", p: "Innsbruck, Neustift, Fulpmes", km: 1000, t: "9:45",
+    s: [["A12","NL","Utrecht → Arnhem → grens Elten",""],["A3","DE","Richting Frankfurt / Nürnberg",""],["A9","DE","Richting München",""],["A8","DE","Richting Salzburg","Via de A99 om München, tot Inntaldreieck"],["A93","DE","Richting Kufstein",""],["A12","AT","Inntalautobahn","Tot Innsbruck"],["A13","AT","Brennerautobahn","Afrit Schönberg"],["B183","AT","Stubaitalstraße","Naar Fulpmes en Neustift"]],
+    alt: { tx: "Via Garmisch en Seefeld over de B177. Korter in kilometers, maar met de steile Zirler Berg (caravans verboden bergaf).", r: [["A95","DE"],["B2","DE"],["B177","AT"]] },
+    tips: ["Op de A13 geldt extra tol bovenop het vignet. Kijk op asfinag.at welk deel je rijdt.","Met caravan: de Zirler Berg (B177) is voor caravans bergafwaarts verboden."], vig: true, sm: "A13 Brenner" },
+  { id: "otztal", c: "AT", n: "Ötztal en Arlberg", p: "Sölden, Längenfeld, St. Anton", km: 1050, t: "10:30",
+    s: [["A12","NL","Utrecht → Arnhem → grens Elten",""],["A3","DE","Richting Frankfurt / Nürnberg",""],["A9","DE","Richting München",""],["A8","DE","Richting Salzburg","Via de A99 om München"],["A93","DE","Richting Kufstein",""],["A12","AT","Inntalautobahn","Langs Innsbruck tot afrit Ötztal"],["B186","AT","Ötztalstraße","Naar Längenfeld en Sölden"]],
+    alt: { tx: "Via de A7 tot Füssen en dan de Fernpass (B179). Korter, maar in het weekend berucht om files. Naar St. Anton: A12 tot Landeck, dan de S16.", r: [["A7","DE"],["B179","AT"],["A12","AT"],["S16","AT"]] },
+    tips: ["Op drukke weekenden gelden in Tirol afritverboden. Met een boeking in het Ötztal mag je er gewoon af.","De Arlbergtunnel (S16) ligt voorbij St. Anton; voor St. Anton zelf betaal je geen tunneltol."], vig: true },
+  { id: "vorarlberg", c: "AT", n: "Vorarlberg", p: "Montafon, Bregenzerwald, Bregenz", km: 900, t: "9:00",
+    s: [["A12","NL","Utrecht → Arnhem → grens Elten",""],["A3","DE","Richting Frankfurt / Würzburg","Tot Kreuz Biebelried"],["A7","DE","Richting Ulm / Kempten","Tot Kreuz Memmingen"],["A96","DE","Richting Lindau","Grens Hörbranz"],["A14","AT","Rheintalautobahn","Door de Pfändertunnel, langs Bregenz en Feldkirch tot Bludenz"],["B188","AT","Silvrettastraße","Naar Schruns en het Montafon"]],
+    alt: { tx: "Naar de Bregenzerwald: verlaat de A14 bij Dornbirn en volg de L200 naar Bezau en Mellau.", r: [["A14","AT"],["L200","AT"]] },
+    tips: ["Het eerste stuk van de A14 vanaf de grens tot Hohenems is vignetvrij; verder heb je een vignet nodig.","Rond Bregenz staat in de zomer vaak file voor de Pfändertunnel."], vig: true },
+  { id: "wilder-kaiser", c: "AT", n: "Wilder Kaiser en Kitzbühel", p: "Söll, Ellmau, Kitzbühel, Westendorf", km: 930, t: "9:15",
+    s: [["A12","NL","Utrecht → Arnhem → grens Elten",""],["A3","DE","Richting Frankfurt / Nürnberg",""],["A9","DE","Richting München",""],["A8","DE","Richting Salzburg","Via de A99 om München, tot Inntaldreieck"],["A93","DE","Richting Kufstein",""],["A12","AT","Inntalautobahn","Afrit Kufstein-Süd of Wörgl-Ost"],["B178","AT","Loferer Straße","Naar Söll, Ellmau en Going"],["B170","AT","Brixentaler Straße","Vanaf Wörgl naar Westendorf en Kitzbühel"]],
+    alt: { tx: "Via Rosenheim en de A8 tot afrit Achenmühle/Grabenstätt en binnendoor over Reit im Winkl. Mijdt de file bij Kufstein.", r: [["A8","DE"],["B305","DE"],["B312","AT"]] },
+    tips: ["Rijd je bij Kufstein-Süd van de snelweg af, dan heb je geen vignet nodig.","Op wisselzaterdagen staat de B178 tussen Söll en St. Johann vaak vast."], vig: "deels" },
+  { id: "zell-saalbach", c: "AT", n: "Zell am See en Saalbach", p: "Zell am See, Kaprun, Saalbach-Hinterglemm", km: 1010, t: "10:00",
+    s: [["A12","NL","Utrecht → Arnhem → grens Elten",""],["A3","DE","Richting Frankfurt / Nürnberg",""],["A9","DE","Richting München",""],["A8","DE","Richting Salzburg","Via de A99 om München, afrit Bad Reichenhall"],["B21","DE","Richting Lofer","Grens Melleck/Steinpass"],["B311","AT","Pinzgauer Straße","Via Lofer en Saalfelden naar Zell am See"]],
+    alt: { tx: "Via Kufstein: A12 tot Wörgl, dan B178 naar St. Johann en de B164/B311. Handig als het bij Bad Reichenhall vaststaat.", r: [["A12","AT"],["B178","AT"],["B164","AT"],["B311","AT"]] },
+    tips: ["Deze route gebruikt in Oostenrijk geen snelweg: geen vignet nodig.","Voor Saalbach: bij Maishofen het Glemmtal in."], vig: false },
+  { id: "ski-amade", c: "AT", n: "Salzburger Sportwelt en Gastein", p: "Flachau, Wagrain, Schladming, Bad Gastein", km: 1010, t: "10:00",
+    s: [["A12","NL","Utrecht → Arnhem → grens Elten",""],["A3","DE","Richting Frankfurt / Nürnberg",""],["A9","DE","Richting München",""],["A8","DE","Richting Salzburg","Via de A99 om München, grens Walserberg"],["A1","AT","Westautobahn","Tot Knoten Salzburg"],["A10","AT","Tauernautobahn","Afrit Flachau of Wagrain"]],
+    alt: { tx: "Naar Schladming: A10 tot afrit Radstadt/Ennstal en dan de B320. Naar Bad Gastein: afrit Bischofshofen, B311 tot Lend en de B167.", r: [["A10","AT"],["B320","AT"],["B311","AT"],["B167","AT"]] },
+    tips: ["De afritten Flachau en Wagrain liggen vóór de Tauerntunnel: geen extra tunneltol.","De A10 rond Salzburg en Golling staat op zaterdag vaak vast; vroeg vertrekken loont."], vig: true },
+  { id: "salzkammergut", c: "AT", n: "Salzkammergut", p: "Wolfgangsee, Hallstatt, Bad Ischl", km: 1000, t: "10:00",
+    s: [["A12","NL","Utrecht → Arnhem → grens Elten",""],["A3","DE","Richting Frankfurt / Nürnberg",""],["A9","DE","Richting München",""],["A8","DE","Richting Salzburg","Via de A99 om München, grens Walserberg"],["A1","AT","Westautobahn","Richting Wien, afrit Thalgau"],["B158","AT","Wolfgangsee Straße","Via Fuschl naar St. Gilgen, Strobl en Bad Ischl"],["B145","AT","Salzkammergut Straße","Vanaf Bad Ischl naar Bad Goisern en Hallstatt"]],
+    alt: { tx: "Via Passau en de Innkreisautobahn naar Regau, dan de B145 via Gmunden. Mijdt Salzburg.", r: [["A3","DE"],["A8","AT"],["A1","AT"],["B145","AT"]] },
+    tips: ["Hallstatt is autoluw: parkeer op de grote parkeerplaatsen voor het dorp.","Op de B158 langs de Wolfgangsee is het in de zomer druk met fietsers."], vig: true },
+  { id: "karinthie", c: "AT", n: "Karinthië", p: "Wörthersee, Villach, Klagenfurt, Millstätter See", km: 1170, t: "11:15",
+    s: [["A12","NL","Utrecht → Arnhem → grens Elten",""],["A3","DE","Richting Frankfurt / Nürnberg",""],["A9","DE","Richting München",""],["A8","DE","Richting Salzburg","Via de A99 om München, grens Walserberg"],["A1","AT","Westautobahn","Tot Knoten Salzburg"],["A10","AT","Tauernautobahn","Door Tauern- en Katschbergtunnel tot Villach"],["A2","AT","Südautobahn","Naar Velden, Pörtschach en Klagenfurt"]],
+    alt: { tx: "Naar de Millstätter See: A10 afrit Seeboden. Wil je de tunneltol vermijden, dan kan het via de Großglockner Hochalpenstraße, maar die heeft zelf ook tol en is alleen in de zomer open.", r: [["A10","AT"],["B98","AT"]] },
+    tips: ["Tauern- en Katschbergtunnel: extra tol, ook te betalen als digitaal Streckenmaut-ticket.","Ideale route voor een tussenstop: overnachten rond Salzburg verdeelt de rit in twee."], vig: true, sm: "A10 Tauern/Katschberg" },
+  { id: "wenen", c: "AT", n: "Wenen en Wachau", p: "Wenen, Melk, Dürnstein", km: 1150, t: "11:00",
+    s: [["A12","NL","Utrecht → Arnhem → grens Elten",""],["A3","DE","Richting Frankfurt / Nürnberg / Passau","Langs Würzburg, Nürnberg en Regensburg tot de grens bij Suben"],["A8","AT","Innkreisautobahn","Tot Voralpenkreuz bij Wels"],["A1","AT","Westautobahn","Langs Linz en St. Pölten naar Wenen"]],
+    alt: { tx: "Naar de Wachau: A1 afrit Melk en dan langs de Donau over de B3 of B33.", r: [["A1","AT"],["B3","AT"],["B33","AT"]] },
+    tips: ["De A3 is de hele weg één nummer: makkelijk rijden, maar rond Würzburg, Nürnberg en Regensburg veel werkzaamheden.","Wenen heeft kortparkeerzones in de hele stad; gebruik een P+R aan de rand."], vig: true }
+];
+
+const lijst = document.getElementById("lijst");
+const detail = document.getElementById("detail");
+const zoek = document.getElementById("zoek");
+let filter = "all";
+let current = null;
+
+function cls(road, cc) {
+  const p = road.replace(/[0-9].*/, "");
+  if (cc === "NL") return p === "N" ? "r-nlN" : "r-nlA";
+  if (cc === "DE") return p === "A" ? "r-deA" : "r-deB";
+  return (p === "A" || p === "S") ? "r-atA" : "r-atB";
+}
+function badge(road, cc) { return `<span class="r ${cls(road, cc)}">${road}</span>`; }
+const esc = s => s.replace(/[&<>"]/g, ch => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[ch]));
+const land = { DE: "Duitsland", AT: "Oostenrijk" };
+const fmtKm = n => n.toLocaleString("nl-NL");
+const fmtTijd = t => { const [h, m] = t.split(":"); return `${h} u ${m}`; };
+
+function visible() {
+  const q = zoek.value.trim().toLowerCase();
+  return D.filter(d => (filter === "all" || d.c === filter) &&
+    (!q || (d.n + " " + d.p + " " + land[d.c]).toLowerCase().includes(q)));
+}
+
+function renderList() {
+  const items = visible();
+  if (!items.length) { lijst.innerHTML = `<p class="empty">Geen bestemming gevonden. Probeer een regio of een andere plaatsnaam.</p>`; return; }
+  let html = "";
+  ["DE", "AT"].forEach(c => {
+    const g = items.filter(d => d.c === c);
+    if (!g.length) return;
+    html += `<div class="group-label">${land[c]}</div>`;
+    html += g.map(d => `<button class="dest" id="d-${d.id}" data-id="${d.id}" aria-current="${current === d.id}">
+      <b>${esc(d.n)}</b><span class="km">${fmtKm(d.km)} km</span><small>${esc(d.p)}</small></button>`).join("");
+  });
+  lijst.innerHTML = html;
+}
+
+function vignetPill(d) {
+  if (d.vig === true) return `<span class="pill need">Vignet Oostenrijk nodig</span>`;
+  if (d.vig === "deels") return `<span class="pill need">Vignet nodig voorbij Kufstein-Süd</span>`;
+  return d.c === "AT" ? `<span class="pill free">Geen vignet nodig via deze route</span>` : `<span class="pill free">Geen tol voor personenauto's</span>`;
+}
+
+function renderDetail(id) {
+  const d = D.find(x => x.id === id) || D[0];
+  current = d.id;
+  const summary = d.s.map(([r, c]) => badge(r, c)).join('<span class="arrow">›</span>');
+  detail.innerHTML = `
+    <div class="detail-head">
+      <div>
+        <div class="flag">${land[d.c]}</div>
+        <h2>${esc(d.n)}</h2>
+        <p class="places">${esc(d.p)}</p>
+      </div>
+      <div class="stats">
+        <div class="stat"><span>Afstand</span><strong>± ${fmtKm(d.km)} km</strong></div>
+        <div class="stat"><span>Rijtijd</span><strong>± ${fmtTijd(d.t)}</strong></div>
+      </div>
+    </div>
+    <div class="summary" aria-label="Wegen in volgorde">${summary}</div>
+    <div class="toll">${vignetPill(d)}${d.sm ? `<span class="pill need">Extra tol: ${esc(d.sm)}</span>` : ""}</div>
+
+    <h3>Hoofdroute vanaf Utrecht</h3>
+    <ol class="route">
+      ${d.s.map(([r, c, t, n]) => `<li><div class="sign">${badge(r, c)}</div><div class="txt"><b>${esc(t)}<span class="cc">${c}</span></b>${n ? `<span>${esc(n)}</span>` : ""}</div></li>`).join("")}
+      <li class="end"><div class="sign"><span class="r r-dest">Doel</span></div><div class="txt"><b>${esc(d.p)}</b></div></li>
+    </ol>
+
+    <h3>Alternatief</h3>
+    <div class="alt"><p>${esc(d.alt.tx)}</p><div class="roads">${d.alt.r.map(([r, c]) => badge(r, c)).join("")}</div></div>
+
+    <h3>Goed om te weten</h3>
+    <ul class="tips">${d.tips.map(t => `<li>${esc(t)}</li>`).join("")}</ul>
+
+    <div class="toll"><button class="btn" id="kopieer">Kopieer route als tekst</button><span id="kopieer-status" class="cc" role="status"></span></div>
+  `;
+  document.getElementById("kopieer").addEventListener("click", () => copyRoute(d));
+  renderList();
+}
+
+function copyRoute(d) {
+  const txt = `Route naar ${d.n} (${d.p}) — ± ${fmtKm(d.km)} km, ± ${fmtTijd(d.t)} vanaf Utrecht\n` +
+    d.s.map(([r, c, t, n], i) => `${i + 1}. ${r} (${c}) ${t}${n ? " – " + n : ""}`).join("\n") +
+    `\nAlternatief: ${d.alt.tx}`;
+  const st = document.getElementById("kopieer-status");
+  const ok = () => { st.textContent = "Gekopieerd"; };
+  try {
+    navigator.clipboard.writeText(txt).then(ok).catch(() => fallback(txt, ok));
+  } catch (e) { fallback(txt, ok); }
+}
+function fallback(txt, ok) {
+  const ta = document.createElement("textarea");
+  ta.value = txt; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); ok(); } catch (e) { document.getElementById("kopieer-status").textContent = "Kopiëren lukt hier niet; selecteer de tekst handmatig."; }
+  ta.remove();
+}
+
+lijst.addEventListener("click", e => {
+  const b = e.target.closest(".dest"); if (!b) return;
+  location.hash = b.dataset.id;
+  if (window.matchMedia("(max-width: 820px)").matches) detail.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+document.querySelectorAll(".chip").forEach(ch => ch.addEventListener("click", () => {
+  filter = ch.dataset.f;
+  document.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", x === ch));
+  renderList();
+  const v = visible();
+  if (v.length && !v.some(d => d.id === current)) location.hash = v[0].id;
+}));
+zoek.addEventListener("input", () => {
+  renderList();
+  const v = visible();
+  if (v.length === 1 && v[0].id !== current) location.hash = v[0].id;
+});
+function fromHash() { const h = location.hash.slice(1); renderDetail(D.some(d => d.id === h) ? h : "zillertal"); }
+window.addEventListener("hashchange", fromHash);
+fromHash();
+</script>
