@@ -1,0 +1,203 @@
+/* Layout: asfaltband als kop, links bestemmingslijst, rechts de route als verticale weg met bordjes */
+:root {
+  --bg: #f2f4f6;
+  --surface: #ffffff;
+  --fg: #16212c;
+  --muted: #586572;
+  --line: #d6dce2;
+  --accent: #1d55a0;
+  --accent-soft: #e3ecf8;
+  --asphalt: #232b33;
+  --asphalt-fg: #eef2f5;
+  --lane: #f4c400;
+  --warn-bg: #fff6d6;
+  --warn-fg: #5c4500;
+  --bad-bg: #fde4e4;
+  --bad-fg: #8a1c1c;
+  --ok-bg: #e2f3e8;
+  --ok-fg: #1d5e34;
+  --font-display: "Overpass", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Overpass", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Overpass Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1418; --surface: #171f27; --fg: #e5eaef; --muted: #93a0ac; --line: #2a3541;
+    --accent: #79a6e8; --accent-soft: #1b2a3f; --asphalt: #0a0e12; --asphalt-fg: #e5eaef;
+    --warn-bg: #3a3112; --warn-fg: #f1dc94; --bad-bg: #3d1a1a; --bad-fg: #f3b4b4;
+    --ok-bg: #16301f; --ok-fg: #a5dcb6; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1418; --surface: #171f27; --fg: #e5eaef; --muted: #93a0ac; --line: #2a3541;
+  --accent: #79a6e8; --accent-soft: #1b2a3f; --asphalt: #0a0e12; --asphalt-fg: #e5eaef;
+  --warn-bg: #3a3112; --warn-fg: #f1dc94; --bad-bg: #3d1a1a; --bad-fg: #f3b4b4;
+  --ok-bg: #16301f; --ok-fg: #a5dcb6; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+a { color: var(--accent); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Kop */
+header.road { background: var(--asphalt); color: var(--asphalt-fg); position: relative; overflow: hidden; }
+header.road .wrap { padding-block: 36px 44px; display: grid; gap: 10px; }
+header.road::after { content: ""; position: absolute; left: 0; right: 0; bottom: 18px; height: 4px;
+  background: repeating-linear-gradient(90deg, var(--lane) 0 46px, transparent 46px 82px); opacity: .9; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; opacity: .75; }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(30px, 5vw, 50px); line-height: 1.05; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+header p { margin: 0; max-width: 64ch; opacity: .85; }
+header nav { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; }
+header nav a { color: var(--asphalt-fg); opacity: .85; }
+
+/* Filters */
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding-block: 20px 8px; }
+.controls input { flex: 1 1 240px; min-width: 0; font: inherit; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { font: inherit; font-weight: 600; font-size: 14px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+:focus-visible { outline: 3px solid var(--lane); outline-offset: 2px; }
+
+/* Hoofdindeling */
+main.layout { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 24px; padding-block: 12px 40px; align-items: start; }
+@media (max-width: 820px) { main.layout { grid-template-columns: minmax(0, 1fr); } }
+.list { display: grid; gap: 4px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); max-height: calc(100vh - 24px); overflow-y: auto; padding-right: 4px; }
+@media (max-width: 820px) { .list { position: static; max-height: 320px; border: 1px solid var(--line); border-radius: 10px; padding: 6px; background: var(--surface); } }
+.group-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: 12px 10px 4px; }
+.dest { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 10px 12px; border-radius: 8px; cursor: pointer; }
+.dest:hover { background: var(--accent-soft); }
+.dest[aria-current="true"] { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+.dest:focus-visible { outline: 3px solid var(--lane); }
+.dest b { font-weight: 600; }
+.dest small { grid-column: 1; color: var(--muted); font-size: 13px; }
+.dest .km { grid-row: 1 / span 2; grid-column: 2; align-self: center; font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+.empty { color: var(--muted); padding: 12px; }
+
+/* Detail */
+.detail { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px clamp(16px, 3vw, 32px) 28px; min-width: 0; }
+.detail-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; align-items: flex-start; }
+.detail h2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(24px, 3.4vw, 34px); line-height: 1.1; margin: 4px 0 6px; text-wrap: balance; }
+.detail .places { color: var(--muted); margin: 0; }
+.flag { font-family: var(--font-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.stats { display: flex; gap: 22px; flex-wrap: wrap; }
+.stat { display: grid; }
+.stat span { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.stat strong { font-family: var(--font-mono); font-size: 22px; font-variant-numeric: tabular-nums; }
+.summary { margin: 18px 0 4px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.summary .arrow { color: var(--muted); font-size: 13px; }
+.btn { font: inherit; font-size: 14px; font-weight: 600; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+
+h3 { font-family: var(--font-display); font-size: 18px; margin: 26px 0 10px; }
+ol.route { list-style: none; margin: 0; padding: 0; position: relative; }
+ol.route::before { content: ""; position: absolute; left: 31px; top: 8px; bottom: 8px; width: 6px; border-radius: 3px; background: var(--asphalt); }
+ol.route li { position: relative; display: grid; grid-template-columns: 68px minmax(0, 1fr); gap: 14px; padding: 8px 0; align-items: start; }
+ol.route li .sign { display: flex; justify-content: center; position: relative; z-index: 1; padding-top: 1px; }
+ol.route li .txt { min-width: 0; padding-top: 2px; }
+ol.route li .txt b { display: block; }
+ol.route li .txt span { color: var(--muted); font-size: 14px; }
+.cc { font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: .08em; margin-left: 6px; }
+
+/* Wegnummerbordjes (gestileerd per land) */
+.r { display: inline-block; font-family: var(--font-mono); font-weight: 700; font-size: 13px; line-height: 1; padding: 6px 8px 5px; border-radius: 5px; min-width: 44px; text-align: center; border: 2px solid; white-space: nowrap; }
+.r-red { background: #c8102e; color: #fff; border-color: #fff; box-shadow: 0 0 0 1px #c8102e; }
+.r-yellow { background: #f6c500; color: #111; border-color: #111; }
+.r-blue { background: #1f4fa0; color: #fff; border-color: #fff; box-shadow: 0 0 0 1px #1f4fa0; }
+.r-blue.de { border-radius: 8px; }
+.r-green { background: #00804a; color: #fff; border-color: #fff; box-shadow: 0 0 0 1px #00804a; }
+.r-white { background: #fff; color: #1f4fa0; border-color: #1f4fa0; }
+.r-train { background: #3b3f45; color: #fff; border-color: #fff; box-shadow: 0 0 0 1px #3b3f45; }
+.r-dest { background: var(--fg); color: var(--surface); border-color: var(--fg); }
+
+.alt { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; display: grid; gap: 8px; }
+.alt p { margin: 0; }
+.alt .roads { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+ul.tips { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.toll { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pill { font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); }
+.pill.need { background: var(--warn-bg); color: var(--warn-fg); border-color: transparent; }
+.pill.free { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+
+/* Verkeer live */
+.traffic { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.traffic-head { display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--bg); border-bottom: 1px solid var(--line); font-size: 14px; }
+.traffic-head .live { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.traffic-body { padding: 10px 14px 14px; display: grid; gap: 14px; }
+.road-block { display: grid; gap: 6px; }
+.road-block > div:first-child { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
+.msg { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 10px; padding: 8px 0; border-top: 1px dashed var(--line); font-size: 14px; }
+.msg:first-of-type { border-top: 0; }
+.tag { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 3px 7px; border-radius: 4px; align-self: start; }
+.tag.warn { background: var(--warn-bg); color: var(--warn-fg); }
+.tag.closed { background: var(--bad-bg); color: var(--bad-fg); }
+.tag.ok { background: var(--ok-bg); color: var(--ok-fg); }
+.msg b { display: block; }
+.msg span { color: var(--muted); }
+.msg details summary { cursor: pointer; color: var(--accent); font-size: 13px; }
+.msg details p { margin: 4px 0 0; color: var(--muted); font-size: 13px; white-space: pre-line; }
+.more { font: inherit; font-size: 13px; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+.links { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
+.note { color: var(--muted); font-size: 13px; margin: 0; }
+
+/* Praktische info */
+section.info { padding-block: 8px 48px; scroll-margin-top: 16px; }
+section.info h2 { font-family: var(--font-display); font-weight: 800; font-size: 26px; margin: 0 0 14px; }
+.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; }
+.info-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; min-width: 0; }
+.info-card h3 { margin: 0 0 8px; }
+.info-card ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.info-card p { margin: 0 0 8px; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.disclaimer { background: var(--warn-bg); color: var(--warn-fg); border-radius: 10px; padding: 12px 16px; margin-top: 20px; font-size: 14px; }
+footer { color: var(--muted); font-size: 13px; padding-block: 0 32px; }
+/* Alle routes + FAQ */
+.route-index { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 16px; margin-top: 12px; }
+.route-index h3 { margin: 0 0 6px; font-size: 15px; font-family: var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.route-index ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.route-index a { display: block; padding: 6px 0; }
+.faq { display: grid; gap: 8px; max-width: 820px; }
+.faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0 16px; }
+.faq summary { cursor: pointer; font-weight: 600; padding: 14px 0; }
+.faq details p { margin: 0 0 14px; }
+.lijst-toggle { display: none; }
+
+/* Mobiel */
+@media (max-width: 820px) {
+  .controls input { font-size: 16px; }
+  .chips { flex-wrap: nowrap; overflow-x: auto; margin: 0 calc(-1 * max(16px, env(safe-area-inset-right, 0px))) 0 0; padding-right: 16px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: 0 0 auto; min-height: 40px; }
+  .lijst-toggle { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 12px; font: inherit; font-size: 15px; padding: 12px 14px; margin-top: 4px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; text-align: left; }
+  .lijst-toggle b { color: var(--accent); }
+  .lijst-toggle::after { content: "▾"; color: var(--muted); }
+  .lijst-toggle[aria-expanded="true"]::after { content: "▴"; }
+  .list { display: none; max-height: 60vh; }
+  .list.open { display: grid; }
+  .dest { padding: 12px; min-height: 48px; }
+  header.road .wrap { padding-block: 24px 40px; }
+  header p { font-size: 14px; }
+  header nav a, .links a { padding: 6px 0; }
+  .links { gap: 2px 16px; }
+  .detail { border-radius: 12px; padding-top: 20px; }
+  .stats { gap: 16px; }
+  .stat strong { font-size: 19px; }
+  ol.route li { grid-template-columns: 60px minmax(0, 1fr); gap: 10px; }
+  ol.route::before { left: 27px; }
+  .btn { min-height: 44px; }
+}
+@media (prefers-reduced-motion: no-preference) { .detail { animation: rise .25s ease-out; } @keyframes rise { from { transform: translateY(4px); } to { transform: none; } } }
+
+/* Routepagina's */
+.crumbs { display: flex; flex-wrap: wrap; gap: 4px 8px; font-size: 14px; }
+.crumbs a { color: var(--asphalt-fg); opacity: .85; }
+.page { padding-block: 24px 40px; }
+.page h2.sec { font-family: var(--font-display); font-size: 21px; margin: 32px 0 12px; }
+.page .lead { font-size: 16px; max-width: 70ch; }
+.places { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 10px 24px; }
+.places li { padding: 8px 0; border-bottom: 1px solid var(--line); }
+.places li b { display: block; }
+.places li span { color: var(--muted); font-size: 14px; }
+.cta { display: inline-block; margin-top: 8px; padding: 12px 16px; border-radius: 8px; background: var(--accent); color: var(--surface); font-weight: 600; text-decoration: none; }
